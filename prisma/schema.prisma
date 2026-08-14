@@ -1,0 +1,279 @@
+// TemanPAUD — Prisma schema
+// SQLite untuk pengembangan lokal; struktur kompatibel PostgreSQL
+// (ubah provider + DATABASE_URL untuk produksi).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Akun & Profil ----------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("TEACHER") // TEACHER | STUDENT | ADMIN
+  status       String   @default("ACTIVE") // ACTIVE | SUSPENDED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile        Profile?
+  sessions       Session[]
+  savedItems     SavedItem[]
+  generations    Generation[]
+  teachingLogs   TeachingSession[]
+  attempts       SimulatorAttempt[]
+  submissions    MicroteachingSubmission[]
+  xpEvents       XPEvent[]
+  badges         UserBadge[]
+  moduleProgress LearningProgress[]
+  auditLogs      AuditLog[]
+}
+
+model Profile {
+  userId              String  @id
+  userType            String  @default("TEACHER") // TEACHER | STUDENT
+  agePreference       String? // ex: "48-60"
+  institutionType     String? // PAUD | TK | KB | KAMPUS | LAINNYA
+  classSize           Int?
+  semester            Int?
+  focusGoals          String? // JSON array tujuan onboarding
+  onboardingCompleted Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ---------- Konten ----------
+
+model ContentItem {
+  id           String    @id @default(cuid())
+  type         String // ACTIVITY | GAME | TIP | STORY_TEMPLATE | MICROTEACHING_BRIEF
+  slug         String    @unique
+  title        String
+  summary      String
+  status       String    @default("APPROVED") // DRAFT | AI_GENERATED | PENDING_REVIEW | APPROVED | REJECTED | ARCHIVED
+  language     String    @default("id-ID")
+  ageMinMonths Int
+  ageMaxMonths Int
+  durationMin  Int
+  durationMax  Int
+  energyLevel  String    @default("SEDANG") // TENANG | SEDANG | TINGGI
+  location     String    @default("INDOOR") // INDOOR | OUTDOOR | KEDUANYA
+  setupLevel   String    @default("TANPA_PERSIAPAN") // TANPA_PERSIAPAN | RINGAN | SEDANG
+  noTools      Boolean   @default(false)
+  groupSizeMin Int       @default(1)
+  groupSizeMax Int       @default(30)
+  categories   String    @default("[]") // JSON array kategori
+  themes       String    @default("[]") // JSON array tema
+  data         String    @default("{}") // JSON payload spesifik tipe (langkah, script guru, dll)
+  authorType   String    @default("CURATED") // CURATED | AI | USER
+  version      Int       @default(1)
+  publishedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  savedItems   SavedItem[]
+  teachingLogs TeachingSession[]
+
+  @@index([type, status])
+  @@index([type, noTools, location])
+}
+
+model SavedItem {
+  id        String   @id @default(cuid())
+  userId    String
+  contentId String
+  createdAt DateTime @default(now())
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content ContentItem @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId])
+}
+
+model TeachingSession {
+  id        String   @id @default(cuid())
+  userId    String
+  contentId String?
+  source    String // LIBRARY | AI | RANDOM_GAME
+  title     String
+  status    String   @default("VIEWED") // VIEWED | STARTED | USED
+  rating    String? // KURANG | LUMAYAN | SUKA
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content ContentItem? @relation(fields: [contentId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+// ---------- AI ----------
+
+model Generation {
+  id            String   @id @default(cuid())
+  userId        String
+  feature       String // ACTIVITY | STORY | SITUATION | MICROTEACHING_REVIEW
+  inputJson     String
+  outputJson    String?
+  provider      String
+  model         String
+  promptVersion String   @default("v1")
+  tokenInput    Int      @default(0)
+  tokenOutput   Int      @default(0)
+  latencyMs     Int      @default(0)
+  status        String // SUCCESS | SCHEMA_FAILED | SAFETY_REJECTED | ERROR
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([feature, status])
+}
+
+// ---------- Mahasiswa: Learning Path, Simulator, Microteaching, XP ----------
+
+model LearningModule {
+  id          String @id @default(cuid())
+  level       Int
+  order       Int
+  slug        String @unique
+  title       String
+  description String
+  content     String // JSON: sections [{heading, body, points[]}]
+
+  progress LearningProgress[]
+
+  @@index([level, order])
+}
+
+model LearningProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  moduleId    String
+  completedAt DateTime @default(now())
+
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module LearningModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model Simulator {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  description  String
+  difficulty   String   @default("DASAR") // DASAR | MENENGAH | LANJUT
+  ageContext   String
+  status       String   @default("APPROVED")
+  nodes        String // JSON: { startNodeId, nodes: { [id]: { scene, context, choices: [{label, effect, nextNodeId, scores}] } } }
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attempts SimulatorAttempt[]
+}
+
+model SimulatorAttempt {
+  id          String    @id @default(cuid())
+  userId      String
+  simulatorId String
+  status      String    @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  currentNode String?
+  pathJson    String    @default("[]") // JSON array pilihan yang diambil
+  scoresJson  String    @default("{}") // akumulasi skor per dimensi
+  reflection  String?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  simulator Simulator @relation(fields: [simulatorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, simulatorId])
+}
+
+model MicroteachingSubmission {
+  id           String   @id @default(cuid())
+  userId       String
+  briefSlug    String // slug ContentItem MICROTEACHING_BRIEF
+  planJson     String // rencana yang dikirim mahasiswa
+  feedbackJson String? // hasil review AI
+  status       String   @default("SUBMITTED") // SUBMITTED | REVIEWED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model XPEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Int
+  reason    String // SIMULATOR_COMPLETED | REFLECTION | MICROTEACHING | ACTIVITY_CREATED | MODULE_COMPLETED
+  refId     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Badge {
+  id          String @id @default(cuid())
+  slug        String @unique
+  title       String
+  description String
+  icon        String @default("star")
+
+  users UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+}
+
+// ---------- Sistem ----------
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  target    String?
+  detail    String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}

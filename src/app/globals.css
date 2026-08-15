@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  /* Design tokens TemanPAUD — semantic, jangan hardcode warna di komponen */
+  --primary: #0e9488;
+  --primary-strong: #0b7a70;
+  --primary-soft: #d9f2ef;
+  --secondary: #f59e0b;
+  --secondary-soft: #fef3d7;
+  --accent: #f2705f;
+  --accent-soft: #fde8e4;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --surface: #ffffff;
+  --surface-muted: #f6f5f1;
+  --background: #faf9f5;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e7e5df;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-background: var(--background);
+  --color-ink: var(--text);
+  --color-ink-muted: var(--text-muted);
+  --color-line: var(--border);
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --radius-card: 20px;
+  --radius-chip: 999px;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-nunito), system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Fokus yang jelas untuk aksesibilitas */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

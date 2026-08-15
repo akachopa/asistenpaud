@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { Card, Chip } from "@/components/ui";
+import { PageHeader } from "@/components/page-header";
 import { relativeTime } from "@/lib/utils";
+import { AILogsTable } from "./ai-logs-table";
 
 export const metadata = { title: "AI Logs" };
 
@@ -17,14 +19,14 @@ export default async function AdminAIPage() {
     db.generation.groupBy({ by: ["status"], _count: true }),
     db.generation.findMany({
       orderBy: { createdAt: "desc" },
-      take: 50,
+      take: 200,
       include: { user: { select: { email: true } } },
     }),
   ]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-black mb-6">AI Usage</h1>
+    <div className="w-full">
+      <PageHeader title="AI Usage" description="Pantau generasi, latensi, dan status keamanan." />
 
       <div className="grid md:grid-cols-2 gap-4 mb-6">
         <Card className="p-5">
@@ -62,36 +64,18 @@ export default async function AdminAIPage() {
       </div>
 
       <h2 className="font-extrabold mb-3">Log terbaru</h2>
-      <div className="overflow-x-auto bg-surface border border-line rounded-(--radius-card)">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-line text-left">
-              <th className="p-3.5 font-extrabold">Waktu</th>
-              <th className="p-3.5 font-extrabold">User</th>
-              <th className="p-3.5 font-extrabold">Fitur</th>
-              <th className="p-3.5 font-extrabold">Provider</th>
-              <th className="p-3.5 font-extrabold">Latensi</th>
-              <th className="p-3.5 font-extrabold">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recent.map((g) => (
-              <tr key={g.id} className="border-b border-line last:border-0">
-                <td className="p-3.5 text-ink-muted whitespace-nowrap">{relativeTime(g.createdAt)}</td>
-                <td className="p-3.5 text-ink-muted">{g.user.email}</td>
-                <td className="p-3.5 font-bold">{g.feature}</td>
-                <td className="p-3.5 text-ink-muted">
-                  {g.provider} / {g.model}
-                </td>
-                <td className="p-3.5 text-ink-muted">{g.latencyMs}ms</td>
-                <td className="p-3.5">
-                  <Chip tone={STATUS_TONES[g.status] ?? "muted"}>{g.status}</Chip>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AILogsTable
+        rows={recent.map((g) => ({
+          id: g.id,
+          createdAt: relativeTime(g.createdAt),
+          email: g.user.email,
+          feature: g.feature,
+          provider: g.provider,
+          model: g.model,
+          latencyMs: g.latencyMs,
+          status: g.status,
+        }))}
+      />
     </div>
   );
 }

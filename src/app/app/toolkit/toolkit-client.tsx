@@ -15,7 +15,7 @@ export function ToolkitClient() {
   ];
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <h1 className="text-2xl font-black mt-2 mb-1">Classroom Toolkit 🧰</h1>
       <p className="text-ink-muted text-sm mb-4">Alat bantu kelas — tetap bisa dipakai saat offline.</p>
       <div className="grid grid-cols-4 gap-2 mb-5" role="tablist" aria-label="Pilih alat">

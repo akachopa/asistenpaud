@@ -14,7 +14,7 @@ export default async function StudentProfilePage() {
   ]);
 
   return (
-    <main>
+    <main className="w-full max-w-xl">
       <h1 className="text-2xl font-black mt-2 mb-4">Profil Saya</h1>
       <ProfileCard
         user={user}

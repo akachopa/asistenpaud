@@ -62,10 +62,12 @@ export function RandomGameClient({
     }`;
 
   return (
-    <main>
+    <main className="w-full">
       <h1 className="text-2xl font-black mt-2">Kasih Saya Game! 🎰</h1>
       <p className="text-ink-muted mt-1 mb-5">Atur kondisi kelasmu, lalu putar!</p>
 
+      <div className="grid xl:grid-cols-[minmax(0,420px)_1fr] gap-8 items-start">
+      <div>
       <div className="space-y-4">
         <div>
           <p className="text-sm font-extrabold mb-2">Usia</p>
@@ -109,9 +111,10 @@ export function RandomGameClient({
           <p className="font-bold">{error}</p>
         </Card>
       ) : null}
+      </div>
 
       {result ? (
-        <Card className="p-5 mt-5">
+        <Card className="p-5">
           <div className="flex flex-wrap gap-1.5 mb-2">
             <Chip tone="primary">{result.ageLabel}</Chip>
             <Chip>{result.durationLabel}</Chip>
@@ -140,7 +143,18 @@ export function RandomGameClient({
             </div>
           </div>
         </Card>
-      ) : null}
+      ) : (
+        <Card className="p-8 hidden xl:flex items-center justify-center text-center min-h-[280px]">
+          <div>
+            <p className="text-4xl mb-3" aria-hidden>
+              🎰
+            </p>
+            <p className="font-extrabold">Game hasil acak akan muncul di sini</p>
+            <p className="text-sm text-ink-muted mt-1">Atur kondisi, lalu klik Kasih Saya Game!</p>
+          </div>
+        </Card>
+      )}
+      </div>
     </main>
   );
 }

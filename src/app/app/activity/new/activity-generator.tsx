@@ -32,7 +32,7 @@ export function ActivityGenerator({ quickwin }: { quickwin: boolean }) {
   const result = state.result;
 
   return (
-    <main>
+    <main className="w-full">
       {quickwin ? (
         <p className="bg-secondary-soft text-warning font-bold text-sm rounded-2xl px-4 py-3 mt-2">
           🎉 Akunmu siap! Sekarang buat kegiatan pertamamu — cukup 3 isian.
@@ -41,6 +41,8 @@ export function ActivityGenerator({ quickwin }: { quickwin: boolean }) {
       <h1 className="text-2xl font-black mt-3">Buat Kegiatan ✨</h1>
       <p className="text-ink-muted mt-1 mb-5">Besok atau hari ini mau mengajar apa?</p>
 
+      <div className="grid xl:grid-cols-[minmax(0,420px)_1fr] gap-8 items-start">
+      <div>
       <form action={formAction} className="space-y-4">
         <div>
           <p className="text-sm font-extrabold mb-2">Usia anak</p>
@@ -133,9 +135,10 @@ export function ActivityGenerator({ quickwin }: { quickwin: boolean }) {
           </Link>
         </Card>
       ) : null}
+      </div>
 
       {result ? (
-        <div className="mt-6">
+        <div>
           <Card className="p-5">
             <div className="flex flex-wrap gap-1.5 mb-2">
               <Chip tone="primary">{result.age_range}</Chip>
@@ -197,7 +200,18 @@ export function ActivityGenerator({ quickwin }: { quickwin: boolean }) {
             <ListBlock title="🪞 Refleksi guru" items={result.reflection_questions} />
           </Card>
         </div>
-      ) : null}
+      ) : (
+        <Card className="p-8 hidden xl:flex items-center justify-center text-center min-h-[280px]">
+          <div>
+            <p className="text-4xl mb-3" aria-hidden>
+              ✨
+            </p>
+            <p className="font-extrabold">Hasil kegiatan akan muncul di sini</p>
+            <p className="text-sm text-ink-muted mt-1">Isi usia, waktu, dan tema, lalu klik Buatkan Aktivitas.</p>
+          </div>
+        </Card>
+      )}
+      </div>
     </main>
   );
 }

@@ -23,7 +23,7 @@ export default async function ModulePage({ params }: PageProps<"/student/learn/[
   const sections = parseJson<ModuleSection[]>(learningModule.content, []);
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <p className="text-xs font-bold text-primary-strong uppercase tracking-wide mt-2">Level {learningModule.level}</p>
       <h1 className="text-2xl font-black leading-tight mt-1">{learningModule.title}</h1>
       <p className="text-ink-muted mt-2">{learningModule.description}</p>

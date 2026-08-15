@@ -1,7 +1,8 @@
-import { listContent } from "@/lib/content";
-import { ContentCard } from "@/components/content-card";
+import { listContent, toContentRow } from "@/lib/content";
 import { EmptyState, LinkButton } from "@/components/ui";
 import { FilterBar, SearchBox } from "@/components/filter-bar";
+import { PageHeader } from "@/components/page-header";
+import { ContentTable } from "@/components/content-table";
 import { AGE_FILTER_OPTIONS, DURATION_FILTER_OPTIONS, currentFilterValues, filtersFromSearchParams } from "@/lib/filters";
 
 export const metadata = { title: "Games" };
@@ -27,13 +28,12 @@ export default async function GamesPage({ searchParams }: PageProps<"/app/games"
   const items = await listContent("GAME", filters);
 
   return (
-    <main>
-      <div className="flex items-center justify-between mt-2 mb-4">
-        <h1 className="text-2xl font-black">Games 🎲</h1>
-        <LinkButton href="/app/random-game" variant="secondary" className="!min-h-10 !px-4 text-sm">
-          🎰 Acak!
-        </LinkButton>
-      </div>
+    <main className="w-full">
+      <PageHeader
+        title="Games 🎲"
+        description="Permainan cepat untuk segala situasi kelas."
+        action={<LinkButton href="/app/random-game" variant="secondary">🎰 Acak!</LinkButton>}
+      />
       <SearchBox basePath="/app/games" placeholder="Cari game... mis. tepuk, lingkaran" defaultValue={current.q} />
       <FilterBar
         basePath="/app/games"
@@ -44,7 +44,7 @@ export default async function GamesPage({ searchParams }: PageProps<"/app/games"
           { name: "Kategori", key: "category", options: CATEGORY_OPTIONS },
         ]}
       />
-      <div className="space-y-2.5 mt-4">
+      <div className="mt-4">
         {items.length === 0 ? (
           <EmptyState
             emoji="🎲"
@@ -53,7 +53,11 @@ export default async function GamesPage({ searchParams }: PageProps<"/app/games"
             action={<LinkButton href="/app/random-game">🎰 Kasih Saya Game!</LinkButton>}
           />
         ) : (
-          items.map((item) => <ContentCard key={item.id} item={item} />)
+          <ContentTable
+            rows={items.map((item) => toContentRow(item))}
+            searchPlaceholder="Cari di tabel games..."
+            emptyTitle="Tidak ada game"
+          />
         )}
       </div>
     </main>

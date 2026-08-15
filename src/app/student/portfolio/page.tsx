@@ -1,8 +1,10 @@
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getTotalXp, levelForXp } from "@/lib/xp";
-import { Card, Chip, EmptyState, SectionTitle } from "@/components/ui";
+import { Card, SectionTitle } from "@/components/ui";
+import { PageHeader } from "@/components/page-header";
 import { relativeTime, parseJson } from "@/lib/utils";
+import { PortfolioMicroTable, PortfolioSimTable } from "./portfolio-tables";
 
 export const metadata = { title: "Portfolio" };
 
@@ -27,8 +29,8 @@ export default async function PortfolioPage() {
   const level = levelForXp(xp);
 
   return (
-    <main>
-      <h1 className="text-2xl font-black mt-2 mb-4">Practice Portfolio 🏅</h1>
+    <main className="w-full">
+      <PageHeader title="Practice Portfolio 🏅" description="Rekam jejak latihan, badge, dan refleksi." />
 
       <Card className="p-5">
         <div className="flex items-center justify-between">
@@ -57,7 +59,7 @@ export default async function PortfolioPage() {
       {badges.length > 0 ? (
         <>
           <SectionTitle>Badge 🎖</SectionTitle>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {badges.map((ub) => (
               <Card key={ub.id} className="p-4 text-center">
                 <p className="text-3xl" aria-hidden>
@@ -72,47 +74,28 @@ export default async function PortfolioPage() {
       ) : null}
 
       <SectionTitle>Riwayat simulasi 🎭</SectionTitle>
-      {attempts.length === 0 ? (
-        <EmptyState emoji="🎭" title="Belum ada simulasi selesai" description="Selesaikan simulasi pertamamu untuk mengisi portfolio." />
-      ) : (
-        <div className="space-y-2.5">
-          {attempts.map((a) => (
-            <Card key={a.id} className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-extrabold text-sm">{a.simulator.title}</p>
-                <Chip tone="success">✓</Chip>
-              </div>
-              <p className="text-xs text-ink-muted mt-0.5">{a.completedAt ? relativeTime(a.completedAt) : ""}</p>
-              {a.reflection ? (
-                <p className="text-sm mt-2 bg-surface-muted rounded-xl px-3 py-2 italic">🪞 “{a.reflection}”</p>
-              ) : null}
-            </Card>
-          ))}
-        </div>
-      )}
+      <PortfolioSimTable
+        rows={attempts.map((a) => ({
+          id: a.id,
+          title: a.simulator.title,
+          when: a.completedAt ? relativeTime(a.completedAt) : "",
+          reflection: a.reflection ?? "",
+        }))}
+      />
 
       <SectionTitle>Microteaching 📝</SectionTitle>
-      {submissions.length === 0 ? (
-        <EmptyState emoji="📝" title="Belum ada rencana terkirim" description="Kirim rencana mengajar pertamamu untuk mendapatkan feedback." />
-      ) : (
-        <div className="space-y-2.5">
-          {submissions.map((s) => {
-            const plan = parseJson<{ objectives?: string }>(s.planJson, {});
-            return (
-              <Card key={s.id} className="p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-extrabold text-sm">{s.briefSlug.replace(/-/g, " ")}</p>
-                  <Chip tone={s.status === "REVIEWED" ? "success" : "muted"}>
-                    {s.status === "REVIEWED" ? "Direview" : "Terkirim"}
-                  </Chip>
-                </div>
-                <p className="text-xs text-ink-muted mt-0.5">{relativeTime(s.createdAt)}</p>
-                {plan.objectives ? <p className="text-sm mt-2 line-clamp-2">{plan.objectives}</p> : null}
-              </Card>
-            );
-          })}
-        </div>
-      )}
+      <PortfolioMicroTable
+        rows={submissions.map((s) => {
+          const plan = parseJson<{ objectives?: string }>(s.planJson, {});
+          return {
+            id: s.id,
+            title: s.briefSlug.replace(/-/g, " "),
+            status: s.status,
+            when: relativeTime(s.createdAt),
+            objectives: plan.objectives ?? "",
+          };
+        })}
+      />
     </main>
   );
 }

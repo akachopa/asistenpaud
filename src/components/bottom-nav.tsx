@@ -17,7 +17,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
       aria-label="Navigasi utama"
       className="no-print fixed bottom-0 inset-x-0 z-40 border-t border-line bg-surface/95 backdrop-blur"
     >
-      <div className="mx-auto max-w-md grid grid-cols-5">
+      <div className="mx-auto w-full max-w-3xl grid grid-cols-5">
         {items.map((item) => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (

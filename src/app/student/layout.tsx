@@ -1,13 +1,22 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { BottomNav } from "@/components/bottom-nav";
+import { AppShell } from "@/components/app-shell";
 
-const NAV_ITEMS = [
+const BOTTOM_NAV = [
   { href: "/student", label: "Home", icon: "🏠", exact: true },
   { href: "/student/learn", label: "Learn", icon: "📘" },
   { href: "/student/challenges", label: "Challenge", icon: "🎯" },
   { href: "/student/portfolio", label: "Portfolio", icon: "🏅" },
   { href: "/student/profile", label: "Saya", icon: "😊" },
+];
+
+const SIDEBAR = [
+  { href: "/student", label: "Beranda", icon: "🏠", exact: true },
+  { href: "/student/learn", label: "Learning Path", icon: "📘" },
+  { href: "/student/challenges", label: "Simulator", icon: "🎭" },
+  { href: "/student/microteaching", label: "Microteaching", icon: "📝" },
+  { href: "/student/portfolio", label: "Portfolio", icon: "🏅" },
+  { href: "/student/profile", label: "Profil", icon: "😊" },
 ];
 
 export default async function StudentLayout({ children }: LayoutProps<"/student">) {
@@ -16,9 +25,15 @@ export default async function StudentLayout({ children }: LayoutProps<"/student"
   if (!user.profile?.onboardingCompleted && user.role !== "ADMIN") redirect("/onboarding");
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="flex-1 mx-auto w-full max-w-md px-4 pt-4 pb-24">{children}</div>
-      <BottomNav items={NAV_ITEMS} />
-    </div>
+    <AppShell
+      brand="TemanPAUD"
+      brandHref="/student"
+      userName={user.name}
+      userRole="Mahasiswa PGPAUD"
+      sidebar={SIDEBAR}
+      bottomNav={BOTTOM_NAV}
+    >
+      {children}
+    </AppShell>
   );
 }

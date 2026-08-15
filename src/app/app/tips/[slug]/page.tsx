@@ -10,7 +10,7 @@ export default async function TipDetailPage({ params }: PageProps<"/app/tips/[sl
   const data = contentData<TipData>(item);
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <Chip tone="secondary">{data.category}</Chip>
       <h1 className="text-2xl font-black mt-2 leading-tight">{item.title}</h1>
 

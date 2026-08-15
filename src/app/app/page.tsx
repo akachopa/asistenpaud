@@ -32,29 +32,29 @@ export default async function TeacherHomePage() {
     db.teachingSession.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
-      take: 3,
+      take: 4,
     }),
-    recommendForUser(user.id, user.profile?.agePreference ?? null),
+    recommendForUser(user.id, user.profile?.agePreference ?? null, 6),
   ]);
 
   return (
-    <main>
-      <p className="text-sm text-ink-muted mt-2">Halo, {user.name.split(" ")[0]}! 🌞</p>
-      <h1 className="text-2xl font-black leading-tight mt-1">
+    <main className="w-full">
+      <p className="text-sm text-ink-muted">Halo, {user.name.split(" ")[0]}! 🌞</p>
+      <h1 className="text-3xl sm:text-4xl font-black leading-tight mt-1 max-w-3xl">
         Mau ngapain bersama anak-anak hari ini?
       </h1>
 
-      <div className="grid grid-cols-3 gap-2.5 mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mt-6">
         {QUICK_ACTIONS.map((a) => (
           <Link
             key={a.href}
             href={a.href}
-            className="flex flex-col items-center gap-1.5 bg-surface border border-line rounded-(--radius-card) p-3.5 text-center hover:border-primary transition-colors"
+            className="flex flex-col items-center gap-2 bg-surface border border-line rounded-(--radius-card) p-4 text-center hover:border-primary hover:shadow-sm transition-all"
           >
-            <span className="text-2xl" aria-hidden>
+            <span className="text-3xl" aria-hidden>
               {a.icon}
             </span>
-            <span className="text-xs font-bold leading-tight">{a.label}</span>
+            <span className="text-sm font-bold leading-tight">{a.label}</span>
           </Link>
         ))}
       </div>
@@ -72,32 +72,37 @@ export default async function TeacherHomePage() {
         ))}
       </div>
 
-      {recent.length > 0 ? (
-        <>
+      <div className="grid lg:grid-cols-3 gap-8 mt-2">
+        <div className="lg:col-span-1">
           <SectionTitle>Lanjutkan 📌</SectionTitle>
-          <div className="space-y-2">
-            {recent.map((s) => (
-              <Link
-                key={s.id}
-                href="/app/history"
-                className="flex items-center justify-between bg-surface border border-line rounded-2xl px-4 py-3 hover:border-primary transition-colors"
-              >
-                <div className="min-w-0">
-                  <p className="font-bold text-sm truncate">{s.title}</p>
-                  <p className="text-xs text-ink-muted">{relativeTime(s.createdAt)}</p>
-                </div>
-                <span aria-hidden>›</span>
-              </Link>
+          {recent.length === 0 ? (
+            <p className="text-sm text-ink-muted">Belum ada riwayat. Buat kegiatan pertamamu!</p>
+          ) : (
+            <div className="space-y-2">
+              {recent.map((s) => (
+                <Link
+                  key={s.id}
+                  href="/app/history"
+                  className="flex items-center justify-between bg-surface border border-line rounded-2xl px-4 py-3 hover:border-primary transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm truncate">{s.title}</p>
+                    <p className="text-xs text-ink-muted">{relativeTime(s.createdAt)}</p>
+                  </div>
+                  <span aria-hidden>›</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="lg:col-span-2">
+          <SectionTitle>Untukmu hari ini 🌈</SectionTitle>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {recommendations.map((item) => (
+              <ContentCard key={item.id} item={item} />
             ))}
           </div>
-        </>
-      ) : null}
-
-      <SectionTitle>Untukmu hari ini 🌈</SectionTitle>
-      <div className="space-y-2.5">
-        {recommendations.map((item) => (
-          <ContentCard key={item.id} item={item} />
-        ))}
+        </div>
       </div>
     </main>
   );

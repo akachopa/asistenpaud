@@ -28,7 +28,7 @@ export function FilterBar({
   return (
     <div className="space-y-2.5">
       {groups.map((group) => (
-        <div key={group.key} className="flex gap-1.5 overflow-x-auto pb-1 -mx-4 px-4">
+        <div key={group.key} className="flex gap-1.5 overflow-x-auto pb-1">
           <Link
             href={buildHref(group.key, null)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold border-2 transition-colors ${

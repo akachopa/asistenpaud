@@ -16,7 +16,7 @@ export default async function MicroteachingBriefPage({ params }: PageProps<"/stu
   const data = parseJson<BriefData>(brief.data, {} as BriefData);
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <h1 className="text-2xl font-black leading-tight mt-2">{brief.title}</h1>
       <Card className="p-5 mt-4">
         <h2 className="font-extrabold text-sm mb-3">📋 Brief tantangan</h2>

@@ -11,7 +11,7 @@ export default async function SimulatorPage({ params }: PageProps<"/student/simu
   if (!simulator || simulator.status !== "APPROVED") notFound();
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <div className="flex flex-wrap gap-1.5 mt-2">
         <Chip tone="primary">{simulator.difficulty}</Chip>
         <Chip>{simulator.ageContext}</Chip>

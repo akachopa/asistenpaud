@@ -21,7 +21,7 @@ export default async function ActivityDetailPage({ params }: PageProps<"/app/act
   const allSteps = [...(data.opening ?? []), ...(data.mainSteps ?? []), ...(data.closing ?? [])];
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <h1 className="text-2xl font-black mt-2 leading-tight">{item.title}</h1>
       <p className="text-ink-muted mt-2">{item.summary}</p>
       <div className="flex flex-wrap gap-1.5 mt-3">

@@ -1,13 +1,29 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { BottomNav } from "@/components/bottom-nav";
+import { AppShell } from "@/components/app-shell";
 
-const NAV_ITEMS = [
+const BOTTOM_NAV = [
   { href: "/app", label: "Home", icon: "🏠", exact: true },
   { href: "/app/explore", label: "Explore", icon: "🔍" },
   { href: "/app/create", label: "Buat", icon: "✨" },
   { href: "/app/collections", label: "Koleksi", icon: "📚" },
   { href: "/app/profile", label: "Saya", icon: "😊" },
+];
+
+const SIDEBAR = [
+  { href: "/app", label: "Beranda", icon: "🏠", exact: true },
+  { href: "/app/explore", label: "Jelajahi", icon: "🔍" },
+  { href: "/app/create", label: "Buat", icon: "✨" },
+  { href: "/app/activities", label: "Aktivitas", icon: "🎨" },
+  { href: "/app/games", label: "Games", icon: "🎲" },
+  { href: "/app/random-game", label: "Acak Game", icon: "🎰" },
+  { href: "/app/stories", label: "Cerita", icon: "📖" },
+  { href: "/app/tips", label: "Tips", icon: "💡" },
+  { href: "/app/assistant", label: "Tanya Teman Guru", icon: "💬" },
+  { href: "/app/toolkit", label: "Toolkit", icon: "🧰" },
+  { href: "/app/collections", label: "Koleksi", icon: "📚" },
+  { href: "/app/history", label: "Riwayat", icon: "🕰" },
+  { href: "/app/profile", label: "Profil", icon: "😊" },
 ];
 
 export default async function TeacherLayout({ children }: LayoutProps<"/app">) {
@@ -16,9 +32,15 @@ export default async function TeacherLayout({ children }: LayoutProps<"/app">) {
   if (!user.profile?.onboardingCompleted && user.role !== "ADMIN") redirect("/onboarding");
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="flex-1 mx-auto w-full max-w-md px-4 pt-4 pb-24">{children}</div>
-      <BottomNav items={NAV_ITEMS} />
-    </div>
+    <AppShell
+      brand="TemanPAUD"
+      brandHref="/app"
+      userName={user.name}
+      userRole="Guru PAUD"
+      sidebar={SIDEBAR}
+      bottomNav={BOTTOM_NAV}
+    >
+      {children}
+    </AppShell>
   );
 }

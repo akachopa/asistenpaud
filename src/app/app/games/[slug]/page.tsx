@@ -20,7 +20,7 @@ export default async function GameDetailPage({ params }: PageProps<"/app/games/[
   const categories = parseJson<string[]>(item.categories, []);
 
   return (
-    <main>
+    <main className="w-full max-w-3xl">
       <h1 className="text-2xl font-black mt-2 leading-tight">{item.title}</h1>
       {data.hook ? <p className="text-primary-strong font-bold mt-1.5">{data.hook}</p> : null}
       <p className="text-ink-muted mt-1.5">{item.summary}</p>

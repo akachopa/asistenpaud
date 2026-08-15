@@ -18,12 +18,14 @@ export function AssistantClient() {
   const result = state.result;
 
   return (
-    <main>
+    <main className="w-full">
       <h1 className="text-2xl font-black mt-2">Ada situasi apa di kelas? 💬</h1>
       <p className="text-ink-muted mt-1 mb-5">
         Ceritakan yang sedang terjadi. Teman Guru akan bantu dengan langkah konkret — bukan teori panjang.
       </p>
 
+      <div className="grid xl:grid-cols-[minmax(0,420px)_1fr] gap-8 items-start">
+      <div>
       <form action={formAction} className="space-y-4">
         <textarea
           ref={textareaRef}
@@ -59,9 +61,10 @@ export function AssistantClient() {
           <p className="font-bold text-danger">{state.error}</p>
         </Card>
       ) : null}
+      </div>
 
       {result ? (
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4">
           <Card className="p-5 bg-secondary-soft border-secondary/40">
             <p className="text-sm leading-relaxed font-bold">{result.empathy_opener}</p>
           </Card>
@@ -87,7 +90,18 @@ export function AssistantClient() {
             </div>
           </Card>
         </div>
-      ) : null}
+      ) : (
+        <Card className="p-8 hidden xl:flex items-center justify-center text-center min-h-[280px]">
+          <div>
+            <p className="text-4xl mb-3" aria-hidden>
+              💬
+            </p>
+            <p className="font-extrabold">Saran akan muncul di sini</p>
+            <p className="text-sm text-ink-muted mt-1">Ceritakan situasinya, atau pilih contoh di sebelah kiri.</p>
+          </div>
+        </Card>
+      )}
+      </div>
     </main>
   );
 }

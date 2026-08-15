@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata = { title: "Buat" };
 
@@ -11,22 +12,20 @@ const CREATE_OPTIONS = [
 
 export default function CreatePage() {
   return (
-    <main>
-      <h1 className="text-2xl font-black mt-2 mb-5">Mau buat apa? ✨</h1>
-      <div className="space-y-3">
+    <main className="w-full">
+      <PageHeader title="Mau buat apa? ✨" description="Pilih jenis bantuan yang kamu butuhkan sekarang." />
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {CREATE_OPTIONS.map((o) => (
           <Link
             key={o.href}
             href={o.href}
-            className="flex items-center gap-4 bg-surface border border-line rounded-(--radius-card) p-4 hover:border-primary transition-colors"
+            className="flex flex-col bg-surface border border-line rounded-(--radius-card) p-6 hover:border-primary hover:shadow-sm transition-all h-full"
           >
-            <span className="text-3xl" aria-hidden>
+            <span className="text-4xl" aria-hidden>
               {o.icon}
             </span>
-            <div>
-              <h2 className="font-extrabold">{o.title}</h2>
-              <p className="text-sm text-ink-muted">{o.desc}</p>
-            </div>
+            <h2 className="font-extrabold text-lg mt-3">{o.title}</h2>
+            <p className="text-sm text-ink-muted mt-1">{o.desc}</p>
           </Link>
         ))}
       </div>

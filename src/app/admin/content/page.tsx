@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { Chip } from "@/components/ui";
-import { setContentStatusAction } from "../actions";
+import { PageHeader } from "@/components/page-header";
+import { ContentAdminTable } from "./content-admin-table";
 
 export const metadata = { title: "Konten" };
 
@@ -14,14 +14,6 @@ const TYPES = [
   { value: "MICROTEACHING_BRIEF", label: "Microteaching" },
 ];
 
-const STATUS_TONES: Record<string, "success" | "warning" | "danger" | "muted"> = {
-  APPROVED: "success",
-  PENDING_REVIEW: "warning",
-  REJECTED: "danger",
-  ARCHIVED: "muted",
-  DRAFT: "muted",
-};
-
 export default async function AdminContentPage({ searchParams }: PageProps<"/admin/content">) {
   const params = await searchParams;
   const type = typeof params.type === "string" ? params.type : "";
@@ -30,19 +22,19 @@ export default async function AdminContentPage({ searchParams }: PageProps<"/adm
     db.contentItem.findMany({
       where: type ? { type } : undefined,
       orderBy: { updatedAt: "desc" },
-      take: 100,
+      take: 500,
     }),
     db.contentItem.groupBy({ by: ["status"], _count: true }),
   ]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-black mb-4">Konten</h1>
-      <div className="flex flex-wrap gap-3 mb-5">
+    <div className="w-full">
+      <PageHeader title="Konten" description="Tinjau, terbitkan, atau arsipkan materi terkurasi." />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
         {statusCounts.map((s) => (
-          <div key={s.status} className="bg-surface border border-line rounded-2xl px-4 py-2.5">
-            <span className="font-black text-lg">{s._count}</span>{" "}
-            <span className="text-xs font-bold text-ink-muted">{s.status}</span>
+          <div key={s.status} className="bg-surface border border-line rounded-2xl px-4 py-3">
+            <p className="font-black text-2xl text-primary-strong">{s._count}</p>
+            <p className="text-xs font-bold text-ink-muted">{s.status}</p>
           </div>
         ))}
       </div>
@@ -59,54 +51,16 @@ export default async function AdminContentPage({ searchParams }: PageProps<"/adm
           </Link>
         ))}
       </div>
-      <div className="overflow-x-auto bg-surface border border-line rounded-(--radius-card)">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-line text-left">
-              <th className="p-3.5 font-extrabold">Judul</th>
-              <th className="p-3.5 font-extrabold">Tipe</th>
-              <th className="p-3.5 font-extrabold">Sumber</th>
-              <th className="p-3.5 font-extrabold">Status</th>
-              <th className="p-3.5 font-extrabold">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-b border-line last:border-0">
-                <td className="p-3.5 font-bold max-w-xs">
-                  <p className="truncate">{item.title}</p>
-                  <p className="text-xs text-ink-muted font-normal truncate">{item.slug}</p>
-                </td>
-                <td className="p-3.5">
-                  <Chip>{item.type}</Chip>
-                </td>
-                <td className="p-3.5 text-ink-muted">{item.authorType}</td>
-                <td className="p-3.5">
-                  <Chip tone={STATUS_TONES[item.status] ?? "muted"}>{item.status}</Chip>
-                </td>
-                <td className="p-3.5">
-                  <div className="flex gap-2">
-                    {item.status !== "APPROVED" ? (
-                      <form action={setContentStatusAction.bind(null, item.id, "APPROVED")}>
-                        <button type="submit" className="text-xs font-bold text-success hover:underline">
-                          Terbitkan
-                        </button>
-                      </form>
-                    ) : null}
-                    {item.status !== "ARCHIVED" ? (
-                      <form action={setContentStatusAction.bind(null, item.id, "ARCHIVED")}>
-                        <button type="submit" className="text-xs font-bold text-danger hover:underline">
-                          Arsipkan
-                        </button>
-                      </form>
-                    ) : null}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ContentAdminTable
+        rows={items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          type: item.type,
+          authorType: item.authorType,
+          status: item.status,
+        }))}
+      />
     </div>
   );
 }

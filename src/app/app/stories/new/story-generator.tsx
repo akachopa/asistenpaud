@@ -21,10 +21,12 @@ export function StoryGenerator() {
   const result = state.result;
 
   return (
-    <main>
+    <main className="w-full">
       <h1 className="text-2xl font-black mt-2">Buat Cerita 📖</h1>
       <p className="text-ink-muted mt-1 mb-5">Cerita interaktif dengan tokoh original, siap dibawakan.</p>
 
+      <div className="grid xl:grid-cols-[minmax(0,420px)_1fr] gap-8 items-start">
+      <div>
       <form
         action={(fd) => {
           setRevealed(0);
@@ -79,9 +81,10 @@ export function StoryGenerator() {
           <p className="font-bold text-danger">{state.error}</p>
         </Card>
       ) : null}
+      </div>
 
       {result ? (
-        <div className="mt-6">
+        <div>
           <Card className="p-5">
             <h2 className="text-xl font-black">{result.title}</h2>
             <p className="text-sm font-bold text-primary-strong mt-2">Pertanyaan pembuka:</p>
@@ -124,7 +127,18 @@ export function StoryGenerator() {
             </div>
           </Card>
         </div>
-      ) : null}
+      ) : (
+        <Card className="p-8 hidden xl:flex items-center justify-center text-center min-h-[280px]">
+          <div>
+            <p className="text-4xl mb-3" aria-hidden>
+              📖
+            </p>
+            <p className="font-extrabold">Cerita akan muncul di sini</p>
+            <p className="text-sm text-ink-muted mt-1">Isi tema, lalu klik Buatkan Cerita.</p>
+          </div>
+        </Card>
+      )}
+      </div>
     </main>
   );
 }

@@ -1,7 +1,9 @@
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { ContentCard } from "@/components/content-card";
+import { toContentRow } from "@/lib/content";
 import { EmptyState, LinkButton } from "@/components/ui";
+import { PageHeader } from "@/components/page-header";
+import { ContentTable } from "@/components/content-table";
 
 export const metadata = { title: "Koleksi" };
 
@@ -14,8 +16,8 @@ export default async function CollectionsPage() {
   });
 
   return (
-    <main>
-      <h1 className="text-2xl font-black mt-2 mb-4">Koleksiku 📚</h1>
+    <main className="w-full">
+      <PageHeader title="Koleksiku 📚" description="Aktivitas, games, dan cerita yang kamu simpan." />
       {saved.length === 0 ? (
         <EmptyState
           emoji="📚"
@@ -24,11 +26,11 @@ export default async function CollectionsPage() {
           action={<LinkButton href="/app/explore">Jelajahi Konten</LinkButton>}
         />
       ) : (
-        <div className="space-y-2.5">
-          {saved.map((s) => (
-            <ContentCard key={s.id} item={s.content} />
-          ))}
-        </div>
+        <ContentTable
+          rows={saved.map((s) => toContentRow(s.content))}
+          searchPlaceholder="Cari di koleksi..."
+          emptyTitle="Tidak ada item"
+        />
       )}
     </main>
   );

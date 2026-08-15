@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { PageHeader } from "@/components/page-header";
 
 const SECTIONS = [
   { href: "/app/activities", icon: "🎨", title: "Aktivitas", desc: "Kegiatan belajar lengkap dengan langkah dan observasi", type: "ACTIVITY" },
@@ -19,23 +20,21 @@ export default async function ExplorePage() {
   const countMap = Object.fromEntries(counts.map((c) => [c.type, c._count]));
 
   return (
-    <main>
-      <h1 className="text-2xl font-black mt-2 mb-5">Jelajahi 🔍</h1>
-      <div className="space-y-3">
+    <main className="w-full">
+      <PageHeader title="Jelajahi 🔍" description="Pilih jenis materi yang kamu butuhkan hari ini." />
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {SECTIONS.map((s) => (
           <Link
             key={s.href}
             href={s.href}
-            className="flex items-center gap-4 bg-surface border border-line rounded-(--radius-card) p-4 hover:border-primary transition-colors"
+            className="flex flex-col bg-surface border border-line rounded-(--radius-card) p-6 hover:border-primary hover:shadow-sm transition-all h-full"
           >
-            <span className="text-3xl" aria-hidden>
+            <span className="text-4xl" aria-hidden>
               {s.icon}
             </span>
-            <div className="flex-1">
-              <h2 className="font-extrabold">{s.title}</h2>
-              <p className="text-sm text-ink-muted">{s.desc}</p>
-            </div>
-            <span className="text-sm font-bold text-primary-strong shrink-0">{countMap[s.type] ?? 0}</span>
+            <h2 className="font-extrabold text-lg mt-3">{s.title}</h2>
+            <p className="text-sm text-ink-muted mt-1 flex-1">{s.desc}</p>
+            <p className="text-sm font-black text-primary-strong mt-4">{countMap[s.type] ?? 0} materi</p>
           </Link>
         ))}
       </div>

@@ -17,7 +17,7 @@ export interface ContentFilters {
 export async function listContent(
   type: string,
   filters: ContentFilters,
-  take = 60,
+  take = 400,
 ): Promise<ContentItem[]> {
   const where: Record<string, unknown> = { type, status: "APPROVED" };
   if (filters.ageMonths) {
@@ -172,4 +172,30 @@ export function contentCategories(item: ContentItem): string[] {
 
 export function contentThemes(item: ContentItem): string[] {
   return parseJson<string[]>(item.themes, []);
+}
+
+const TYPE_PATHS: Record<string, string> = {
+  ACTIVITY: "/app/activities",
+  GAME: "/app/games",
+  TIP: "/app/tips",
+  STORY_TEMPLATE: "/app/stories",
+  MICROTEACHING_BRIEF: "/student/microteaching",
+};
+
+export function toContentRow(item: ContentItem, hrefOverride?: string) {
+  const min = Math.floor(item.ageMinMonths / 12);
+  const max = Math.ceil(item.ageMaxMonths / 12);
+  return {
+    id: item.id,
+    slug: item.slug,
+    title: item.title,
+    summary: item.summary,
+    type: item.type,
+    href: hrefOverride ?? `${TYPE_PATHS[item.type] ?? "/app/activities"}/${item.slug}`,
+    ageLabel: `${min}\u2013${max} tahun`,
+    durationLabel: item.durationMin === item.durationMax ? `${item.durationMin} menit` : `${item.durationMin}\u2013${item.durationMax} menit`,
+    noTools: item.noTools,
+    location: item.location,
+    categories: parseJson<string[]>(item.categories, []).join(", "),
+  };
 }
